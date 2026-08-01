@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cristóbal Yévenes | Ecosistema de Conocimiento</title>
+    <title>Cristóbal Yévenes | Ecosistema de Conocimiento & Santo Juego</title>
     
     <!-- Favicon desde Supabase -->
     <link rel="icon" href="https://jvjragofbpcfswhchnqc.supabase.co/storage/v1/object/public/IMAGENES/qwrqfff.png" type="image/png">
@@ -161,6 +161,37 @@
             transform: scale(1) translateY(0);
         }
         
+        /* Range Sliders personalizados para Audio */
+        input[type=range].audio-slider {
+            -webkit-appearance: none;
+            background: transparent;
+            width: 100%;
+        }
+        input[type=range].audio-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            margin-top: -4px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+        }
+        input[type=range].audio-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        input[type=range].audio-slider::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+        }
+        input[type=range].audio-slider:focus {
+            outline: none;
+        }
+        
         /* Visor PDF Iframe */
         .pdf-frame {
             background: #E8E6DF url('https://placehold.co/100x100/E8E6DF/a0a0a0?text=Cargando+Documento...') no-repeat center center;
@@ -255,6 +286,7 @@
                 <a href="#recursos" class="hover:text-ink transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-px after:bg-ink after:transition-all hover:after:w-full">Material de Estudio</a>
                 <a href="#mediateca" class="hover:text-ink transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-px after:bg-ink after:transition-all hover:after:w-full">Música</a>
                 <a href="#sobre-mi" class="hover:text-ink transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-px after:bg-ink after:transition-all hover:after:w-full">Sobre mí</a>
+                <a href="#santo-juego" class="hover:text-gold font-semibold transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-px after:bg-gold after:transition-all hover:after:w-full">Santo Juego</a>
             </div>
 
             <div class="flex items-center space-x-4">
@@ -565,7 +597,7 @@
                 <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 fade-up">
                     <div>
                         <h2 class="text-4xl md:text-5xl font-serif mb-4">Música</h2>
-                        <p class="text-gray-400 font-light max-w-md">Obras musicales y canciones de alabanza. Haz clic en cualquiera para escucharla directamente en YouTube.</p>
+                        <p class="text-gray-400 font-light max-w-md">Obras musicales y canciones de alabanza. Disfruta de la lista de reproducción mientras exploras la biblioteca.</p>
                     </div>
                     <a href="https://youtube.com/@cristobalyevenes885" target="_blank" rel="noreferrer" class="mt-8 md:mt-0 text-sm font-medium tracking-wide inline-flex items-center text-gray-300 hover:text-gold transition-colors group px-5 py-2.5 rounded-full border border-white/10 hover:border-gold/40 bg-white/5">
                         <svg class="w-4 h-4 mr-2.5 fill-current text-red-500 group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
@@ -576,8 +608,58 @@
                     </a>
                 </div>
 
-                <div id="media-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <!-- Videos se inyectarán aquí -->
+                <div class="max-w-5xl mx-auto bg-stone-900/60 backdrop-blur-xl rounded-3xl border border-white/10 p-6 md:p-10 shadow-2xl fade-up delay-100">
+                    <div class="flex flex-col lg:flex-row gap-10 items-center lg:items-end mb-10">
+                        
+                        <!-- Portada -->
+                        <a href="#" id="player-cover-link" target="_blank" class="relative group w-64 h-64 md:w-80 md:h-80 flex-shrink-0 rounded-2xl overflow-hidden shadow-2xl shadow-black/50 block">
+                            <img id="player-cover" src="https://placehold.co/600x600/1A1C20/FFFFFF?text=Cargando..." alt="Portada" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center">
+                                <i data-lucide="youtube" class="w-12 h-12 text-white mb-2"></i>
+                                <span class="text-xs font-bold uppercase tracking-widest text-white">Ver en YouTube</span>
+                            </div>
+                        </a>
+                        
+                        <!-- Controles e Info -->
+                        <div class="flex-1 w-full flex flex-col justify-end">
+                            <div class="mb-8 text-center lg:text-left">
+                                <h3 id="player-title" class="text-3xl md:text-5xl font-serif text-white mb-3 leading-tight">Selecciona una canción</h3>
+                                <p class="text-gold text-sm md:text-base font-semibold uppercase tracking-widest">Cristóbal Yévenes</p>
+                            </div>
+                            
+                            <!-- Barra de Progreso Custom -->
+                            <div class="mb-6 flex items-center gap-4">
+                                <span id="time-current" class="text-xs text-gray-400 font-medium w-12 text-right">0:00</span>
+                                <div class="flex-1 relative h-1.5 bg-white/10 rounded-full cursor-pointer group flex items-center" id="progress-container">
+                                    <div id="progress-bar" class="absolute left-0 top-0 h-full bg-gold rounded-full w-0 group-hover:bg-amber-400 transition-colors pointer-events-none"></div>
+                                    <input type="range" id="progress-slider" min="0" max="100" value="0" class="audio-slider absolute inset-0 opacity-0 cursor-pointer z-10 w-full">
+                                    <div id="progress-thumb-visual" class="absolute h-3 w-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none -ml-1.5 shadow-md z-0"></div>
+                                </div>
+                                <span id="time-total" class="text-xs text-gray-400 font-medium w-12">0:00</span>
+                            </div>
+                            
+                            <!-- Botones y Volumen -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4 md:gap-6 mx-auto lg:mx-0">
+                                    <button id="btn-prev" class="text-gray-400 hover:text-white transition-colors p-2 hover:scale-110 transform"><i data-lucide="skip-back" class="w-7 h-7 fill-current"></i></button>
+                                    <button id="btn-play" class="w-16 h-16 bg-white text-ink rounded-full flex items-center justify-center hover:scale-105 hover:bg-gold hover:text-white transition-all shadow-lg"><i id="play-icon-main" data-lucide="play" class="w-7 h-7 ml-1 fill-current"></i></button>
+                                    <button id="btn-next" class="text-gray-400 hover:text-white transition-colors p-2 hover:scale-110 transform"><i data-lucide="skip-forward" class="w-7 h-7 fill-current"></i></button>
+                                </div>
+                                
+                                <div class="hidden sm:flex items-center gap-3 group w-32">
+                                    <i data-lucide="volume-2" class="w-5 h-5 text-gray-400"></i>
+                                    <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1" class="audio-slider accent-gold">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-white/10 pt-6 mt-4">
+                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 px-2">Lista de Reproducción</h4>
+                        <div id="playlist-container" class="space-y-1 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                            <!-- Los tracks se inyectarán aquí -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -620,6 +702,72 @@
                 </div>
             </div>
         </section>
+
+        <section id="santo-juego" class="py-32 bg-stone-900 text-white relative overflow-hidden border-t border-stone-800">
+            <div class="absolute inset-0 opacity-[0.03]" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E');"></div>
+
+            <div class="max-w-7xl mx-auto px-6 lg:px-12 relative z-10 text-center">
+                
+                <!-- Badge de la sección -->
+                <div class="inline-flex items-center space-x-2 px-4 py-2 bg-amber-400/10 border border-amber-400/30 rounded-full text-xs font-semibold uppercase tracking-widest text-amber-400 mb-10">
+                    <i data-lucide="dices" class="w-4 h-4"></i>
+                    <span>Editorial de Juegos de Mesa</span>
+                </div>
+
+                <!-- Logo Principal Prominente Sin Fondo de Recuadro -->
+                <div class="flex justify-center mb-8 fade-up">
+                    <a href="https://crisnyc25-bot.github.io/Santo-Juego/" target="_blank" rel="noopener noreferrer" class="group transition-transform duration-300 hover:scale-105 inline-block">
+                        <img src="https://didxxirmygarfjljvjtm.supabase.co/storage/v1/object/public/IMAGENES/LOGO%20SANTO%20JUEGO.png" 
+                             alt="Logo Santo Juego Editorial" 
+                             class="h-44 sm:h-56 md:h-72 lg:h-80 w-auto object-contain mx-auto filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.6)]">
+                    </a>
+                </div>
+
+                <!-- Leyenda e Información Explicativa -->
+                <div class="max-w-3xl mx-auto mb-14 fade-up delay-100">
+                    <h2 class="text-4xl md:text-5xl font-serif text-white mb-6 tracking-tight">Santo Juego</h2>
+                    <p class="text-lg md:text-xl text-gray-300 font-light leading-relaxed mb-6">
+                        <strong class="text-white font-medium">Santo Juego</strong> es una editorial de juegos de mesa concebida y desarrollada por Cristóbal Yévenes. Nace con el propósito de ofrecer experiencias recreativas, estratégicas y educativas para la familia, jóvenes e iglesia.
+                    </p>
+                    <p class="text-base md:text-lg text-amber-400/90 font-serif italic">
+                        Un punto de encuentro entre la comunión, el aprendizaje bíblico y la sana diversión a través del juego dinámico.
+                    </p>
+                </div>
+
+                <!-- Muestra Visual de los Juegos -->
+                <div class="max-w-5xl mx-auto mb-14 fade-up delay-200">
+                    <a href="https://crisnyc25-bot.github.io/Santo-Juego/" target="_blank" rel="noopener noreferrer" class="block group relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl transition-all duration-500 hover:border-amber-400/50">
+                        <img src="https://dyiugrsngufinjvjwndn.supabase.co/storage/v1/object/public/MUSICA/juegos.png" 
+                             alt="Juegos de mesa Santo Juego" 
+                             class="w-full h-auto object-cover group-hover:scale-102 transition-transform duration-700"
+                             onerror="this.src='https://placehold.co/1200x600/1A1C20/FFFFFF?text=Colección+de+Juegos+Santo+Juego'">
+                        <div class="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity"></div>
+                        <div class="absolute bottom-6 left-6 right-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-left">
+                            <div>
+                                <span class="text-xs font-bold text-amber-400 uppercase tracking-widest block mb-1">Catálogo Oficial</span>
+                                <h3 class="text-xl md:text-2xl font-serif text-white font-medium">Explora los juegos diseñados por la editorial</h3>
+                            </div>
+                            <span class="px-5 py-2.5 bg-amber-400 text-ink rounded-xl text-xs font-bold uppercase tracking-wider flex items-center shrink-0 group-hover:bg-white transition-colors">
+                                Ver Juegos <i data-lucide="arrow-right" class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"></i>
+                            </span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Botón Principal Call-to-Action -->
+                <div class="fade-up delay-300 flex justify-center">
+                    <a href="https://crisnyc25-bot.github.io/Santo-Juego/" 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       class="px-9 py-5 bg-gold text-ink hover:bg-amber-400 rounded-2xl font-semibold text-sm tracking-wider uppercase transition-all duration-300 shadow-2xl flex items-center space-x-3 group hover:scale-105">
+                        <i data-lucide="gamepad-2" class="w-5 h-5"></i>
+                        <span>Entrar a la Web de Santo Juego</span>
+                        <i data-lucide="external-link" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+
+            </div>
+        </section>
     </main>
 
     <footer class="bg-white py-16 border-t border-gray-100">
@@ -632,8 +780,15 @@
                     </div>
                     <span class="font-serif text-xl tracking-wide text-ink">Cristóbal Yévenes</span>
                 </a>
-                <p class="text-sm font-light text-gray-500 max-w-xs">Plataforma dedicada a la edificación mediante conocimiento bíblico fundamentado.</p>
+                <p class="text-sm font-light text-gray-500 max-w-xs">Plataforma dedicada a la edificación mediante conocimiento bíblico fundamentado y proyectos editoriales.</p>
                 <p class="text-xs font-light text-gray-400 mt-6">&copy; <span id="year"></span> Cristóbal Yévenes. Todos los derechos reservados.</p>
+            </div>
+            
+            <div class="flex items-center space-x-6 text-xs uppercase tracking-wider text-gray-400">
+                <a href="#biblioteca" class="hover:text-ink transition-colors">Libros</a>
+                <a href="#articulos" class="hover:text-ink transition-colors">Ensayos</a>
+                <a href="#mediateca" class="hover:text-ink transition-colors">Música</a>
+                <a href="https://crisnyc25-bot.github.io/Santo-Juego/" target="_blank" class="hover:text-gold transition-colors font-semibold">Santo Juego</a>
             </div>
         </div>
     </footer>
@@ -671,7 +826,6 @@
 
             <div class="p-6 px-8 md:px-16 bg-white border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
                 <div class="flex items-center space-x-3 text-xs text-gray-500 hidden sm:flex">
-                    <!-- Avatar autor en Modal de Artículo desde Supabase -->
                     <img src="https://jvjragofbpcfswhchnqc.supabase.co/storage/v1/object/public/IMAGENES/fggfggfg.png" alt="Cristóbal Yévenes" class="w-8 h-8 rounded-full object-cover grayscale" onerror="this.src='https://placehold.co/100x100/1A1C20/FFFFFF?text=CY'">
                     <span>Escrito por <strong>Cristóbal Yévenes</strong></span>
                 </div>
@@ -687,6 +841,7 @@
         </div>
     </div>
 
+    <!-- Modal de Libro / PDF visor -->
     <div id="book-modal" class="fixed inset-0 z-50 modal-enter flex flex-col md:flex-row">
         <div class="absolute inset-0 bg-black/20 backdrop-blur-sm z-0 md:hidden" onclick="closeBook()"></div>
         
@@ -747,6 +902,33 @@
         </div>
     </div>
 
+    <div id="mini-player" class="fixed bottom-0 left-0 w-full bg-ink/95 backdrop-blur-xl border-t border-white/10 p-3 md:p-4 transform translate-y-full transition-transform duration-500 z-50 flex items-center justify-between shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
+        <div class="max-w-7xl mx-auto w-full flex items-center justify-between px-2 lg:px-8">
+            <div class="flex items-center gap-4 cursor-pointer" onclick="document.getElementById('mediateca').scrollIntoView({behavior: 'smooth'})">
+                <img id="mini-cover" src="" alt="Cover" class="w-12 h-12 rounded object-cover shadow-md">
+                <div>
+                    <div id="mini-title" class="text-sm font-medium text-white line-clamp-1 mb-0.5">Título</div>
+                    <div class="text-[10px] font-semibold text-gold uppercase tracking-wider">Cristóbal Yévenes</div>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4 md:gap-6">
+                <button id="mini-btn-prev" class="text-gray-400 hover:text-white transition-colors hidden sm:block"><i data-lucide="skip-back" class="w-5 h-5 fill-current"></i></button>
+                <button id="mini-btn-play" class="w-10 h-10 bg-white text-ink rounded-full flex items-center justify-center hover:scale-105 transition-transform"><i id="mini-play-icon" data-lucide="play" class="w-5 h-5 ml-0.5 fill-current"></i></button>
+                <button id="mini-btn-next" class="text-gray-400 hover:text-white transition-colors hidden sm:block"><i data-lucide="skip-forward" class="w-5 h-5 fill-current"></i></button>
+                
+                <div class="w-px h-6 bg-white/20 mx-2 hidden sm:block"></div>
+                
+                <button onclick="document.getElementById('mediateca').scrollIntoView({behavior: 'smooth'})" class="text-gray-400 hover:text-white transition-colors" title="Ir al reproductor">
+                    <i data-lucide="maximize-2" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Elemento de audio global -->
+    <audio id="global-audio"></audio>
+
     <div id="search-modal" class="fixed inset-0 z-[60] modal-enter bg-white/95 backdrop-blur-xl">
         <div class="max-w-4xl mx-auto pt-32 px-6 modal-content">
             <div class="flex items-center justify-between mb-8">
@@ -763,10 +945,10 @@
                 <span class="block text-xs text-gray-400 uppercase tracking-widest mb-6">Tópicos Sugeridos</span>
                 <div class="flex flex-wrap gap-3">
                     <button class="px-5 py-2.5 rounded-full border border-gray-200 text-sm font-medium text-gray-600 hover:border-gold hover:text-gold hover:bg-gold/5 transition-all">Adoración</button>
+                    <button class="px-5 py-2.5 rounded-full border border-gray-200 text-sm font-medium text-gray-600 hover:border-gold hover:text-gold hover:bg-gold/5 transition-all">Santo Juego</button>
                     <button class="px-5 py-2.5 rounded-full border border-gray-200 text-sm font-medium text-gray-600 hover:border-gold hover:text-gold hover:bg-gold/5 transition-all">Génesis 36</button>
                     <button class="px-5 py-2.5 rounded-full border border-gray-200 text-sm font-medium text-gray-600 hover:border-gold hover:text-gold hover:bg-gold/5 transition-all">Hermenéutica</button>
                     <button class="px-5 py-2.5 rounded-full border border-gray-200 text-sm font-medium text-gray-600 hover:border-gold hover:text-gold hover:bg-gold/5 transition-all">Apologética</button>
-                    <button class="px-5 py-2.5 rounded-full border border-gray-200 text-sm font-medium text-gray-600 hover:border-gold hover:text-gold hover:bg-gold/5 transition-all">Bosquejos Expositivos</button>
                 </div>
             </div>
         </div>
@@ -779,10 +961,10 @@
         // ==========================================
         // CONFIGURACIÓN DE SUPABASE PARA ARTÍCULOS
         // ==========================================
-        const SUPABASE_URL = 'https://jvjragofbpcfswhchnqc.supabase.co'; // Tu URL actual
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2anJhZ29mYnBjZnN3aGNobnFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4NTA4NTcsImV4cCI6MjEwMDQyNjg1N30.CFNJ8cn7y3bP3e_CS1uDXsiSuACpujuUVNP0Lzy7GOk'; // ¡REEMPLAZA ESTO CON TU CLAVE REAL DE SUPABASE!
+        const SUPABASE_URL = 'https://jvjragofbpcfswhchnqc.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2anJhZ29mYnBjZnN3aGNobnFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4NTA4NTcsImV4cCI6MjEwMDQyNjg1N30.CFNJ8cn7y3bP3e_CS1uDXsiSuACpujuUVNP0Lzy7GOk';
         
-        const supabaseClient = SUPABASE_ANON_KEY !== 'TU_CLAVE_ANON_PUBLICA' 
+        const supabaseClient = (SUPABASE_ANON_KEY && SUPABASE_ANON_KEY !== 'TU_CLAVE_ANON_PUBLICA') 
             ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) 
             : null;
 
@@ -827,7 +1009,7 @@
                 btnDestacado.classList.remove('opacity-50', 'cursor-not-allowed');
                 btnDestacado.removeAttribute('disabled');
 
-                // Renderizar la lista completa dinámicamente según el diseño de las imágenes
+                // Renderizar la lista completa dinámicamente
                 articulos.forEach((art, index) => {
                     const isFirst = index === 0;
                     const catText = art.categoria || 'ENSAYO TEOLÓGICO';
@@ -836,7 +1018,6 @@
                     let html = '';
 
                     if (isFirst) {
-                        // Diseño de la primera tarjeta (Blanca con sombra y botones)
                         html = `
                         <article class="bg-white p-8 md:p-10 rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] fade-up mb-12">
                             <div class="flex items-center justify-between mb-4">
@@ -864,7 +1045,6 @@
                         </article>
                         `;
                     } else {
-                        // Diseño de las siguientes tarjetas (Transparentes con texto)
                         html = `
                         <article class="group pb-10 mb-10 border-b border-gray-200/60 fade-up">
                             <div class="flex items-center space-x-3 mb-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
@@ -899,14 +1079,12 @@
             const art = window.loadedArticles[index];
             if (!art) return;
 
-            // Llenar metadatos del modal
             document.getElementById('art-title').textContent = art.titulo;
             document.getElementById('art-subtitle').textContent = art.subtitulo;
             document.getElementById('art-category').textContent = art.categoria || 'Ensayo Teológico';
             document.getElementById('art-meta-cat').textContent = art.categoria || 'ESTUDIO';
             document.getElementById('art-meta-time').textContent = art.tiempo_lectura || '5 MIN DE LECTURA';
             
-            // Inyectar el HTML directamente desde Supabase. Las reglas CSS se encargarán del diseño.
             document.getElementById('art-body').innerHTML = art.contenido_html;
             
             const modal = document.getElementById('article-modal');
@@ -914,7 +1092,6 @@
             toggleBodyScroll(true);
         }
 
-        // Iniciar la descarga de datos al entrar a la página
         loadArticlesFromDB();
 
         function closeArticle() {
@@ -930,7 +1107,6 @@
             
             const fullText = `${title}\n${subtitle}\n\n${body}`;
             
-            // Usamos un elemento de texto temporal para compatibilidad dentro de iFrames
             const textArea = document.createElement("textarea");
             textArea.value = fullText;
             textArea.style.position = "fixed"; 
@@ -944,13 +1120,11 @@
                 const btn = document.getElementById('art-copy-btn');
                 const originalHTML = btn.innerHTML;
                 
-                // Cambiar el botón a estado de éxito
                 btn.innerHTML = '<i data-lucide="check" class="w-4 h-4 mr-2"></i> ¡Copiado!';
                 btn.classList.add('bg-green-700', 'hover:bg-green-800');
                 btn.classList.remove('bg-[#1A1C20]', 'hover:bg-black');
                 lucide.createIcons({ root: btn });
                 
-                // Restaurar el botón original después de 2 segundos
                 setTimeout(() => {
                     btn.innerHTML = originalHTML;
                     btn.classList.remove('bg-green-700', 'hover:bg-green-800');
@@ -976,14 +1150,18 @@
             { id: 9, title: "Guía de estudio Bíblico", author: "Cristóbal Yévenes", cover: "https://jvjragofbpcfswhchnqc.supabase.co/storage/v1/object/public/libros/Guia%20de%20estudio%20Biblico%20personal.png", pdf: "https://jvjragofbpcfswhchnqc.supabase.co/storage/v1/object/public/libros/Guia%20de%20estudio%20Biblico%20personal.pdf", category: "Metodología", pages: 40, readTime: "1h 00m" }
         ];
 
-        const videos = [
-            { id: "qu8kWzIVt5w", title: "Espera en Dios", category: "Música / Adoración" },
-            { id: "KofAjFQBUnk", title: "Con Dios nunca solo estoy", category: "Música / Reflexión" },
-            { id: "uqn2kEQ3PyU", title: "Va mi barca", category: "Música / Alabanza" },
-            { id: "fnqcPaexGOk", title: "Fiel intercesor", category: "Música / Adoración" }
+        const musicTracks = [
+            { id: 0, title: "Cómo entender", mp3: "https://dyiugrsngufinjvjwndn.supabase.co/storage/v1/object/public/MUSICA/Como%20entender.mp3", ytId: "VA8NBRDVRtI" },
+            { id: 1, title: "Con Dios nunca solo yo estoy", mp3: "https://dyiugrsngufinjvjwndn.supabase.co/storage/v1/object/public/MUSICA/Con%20Dios%20nunca%20solo%20estoy.mp3", ytId: "KofAjFQBUnk" },
+            { id: 2, title: "Espera en Dios", mp3: "https://dyiugrsngufinjvjwndn.supabase.co/storage/v1/object/public/MUSICA/Espera%20en%20Dios.mp3", ytId: "qu8kWzIVt5w" },
+            { id: 3, title: "Fiel intercesor", mp3: "https://dyiugrsngufinjvjwndn.supabase.co/storage/v1/object/public/MUSICA/Fiel%20Intercesor.mp3", ytId: "fnqcPaexGOk" },
+            { id: 4, title: "Gloria al Hijo de Dios", mp3: "https://dyiugrsngufinjvjwndn.supabase.co/storage/v1/object/public/MUSICA/Gloria%20al%20Hijo%20de%20Dios.mp3", ytId: "uxWW-_cfyuQ" },
+            { id: 5, title: "Heme aquí", mp3: "https://dyiugrsngufinjvjwndn.supabase.co/storage/v1/object/public/MUSICA/Heme%20aqui.mp3", ytId: "4B4xT1S-uTg" },
+            { id: 6, title: "Quién es mi Dios", mp3: "https://dyiugrsngufinjvjwndn.supabase.co/storage/v1/object/public/MUSICA/Quien%20es%20mi%20Dios.mp3", ytId: "G4nYCKICLLo" },
+            { id: 7, title: "Socorro", mp3: "https://dyiugrsngufinjvjwndn.supabase.co/storage/v1/object/public/MUSICA/Socorro.mp3", ytId: "CL7z-xQos6I" },
+            { id: 8, title: "Te alabo", mp3: "https://dyiugrsngufinjvjwndn.supabase.co/storage/v1/object/public/MUSICA/Te%20alabo.mp3", ytId: "ZXY0ljg8cDw" }
         ];
 
-        // Render Libros
         const libraryContainer = document.getElementById('library-container');
         books.forEach((book, index) => {
             const delay = index * 50;
@@ -1014,114 +1192,257 @@
             libraryContainer.scrollBy({ left: amount, behavior: 'smooth' });
         }
 
-        // Render Videos YouTube
-        const mediaContainer = document.getElementById('media-container');
-        videos.forEach((video, index) => {
-            const delay = index * 100;
-            const thumbUrl = `https://img.youtube.com/vi/${video.id}/maxresdefault.jpg`;
-            const youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
-            const videoHTML = `
-                <a href="${youtubeUrl}" target="_blank" rel="noopener noreferrer" class="group cursor-pointer block fade-up" style="transition-delay: ${delay}ms">
-                    <div class="relative aspect-[16/9] bg-gray-900 rounded-xl overflow-hidden mb-5 border border-white/5 shadow-lg">
-                        <img src="${thumbUrl}" alt="${video.title}" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out" loading="lazy">
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="w-14 h-14 bg-black/40 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center group-hover:bg-gold group-hover:border-gold group-hover:scale-110 transition-all duration-300">
-                                <i data-lucide="play" class="w-6 h-6 text-white ml-1 fill-white"></i>
-                            </div>
-                        </div>
-                        <div class="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-[10px] text-white px-2 py-0.5 rounded flex items-center space-x-1">
-                            <span>YouTube</span>
-                            <i data-lucide="external-link" class="w-3 h-3"></i>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-2 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-widest">
-                        <span>${video.category}</span>
-                    </div>
-                    <h3 class="font-serif text-xl text-gray-200 group-hover:text-gold transition-colors leading-snug">${video.title}</h3>
-                </a>
-            `;
-            mediaContainer.insertAdjacentHTML('beforeend', videoHTML);
-        });
-        lucide.createIcons({ root: mediaContainer });
-
-        function toggleBodyScroll(disable) {
-            document.body.style.overflow = disable ? 'hidden' : '';
-        }
-
-        // Abrir Libro Modal
         function openBook(id) {
             const book = books.find(b => b.id === id);
-            if(!book) return;
+            if (!book) return;
 
             document.getElementById('modal-book-cover').src = book.cover;
             document.getElementById('modal-book-category').textContent = book.category;
             document.getElementById('modal-book-title').textContent = book.title;
             document.getElementById('modal-book-author').textContent = book.author;
-            document.getElementById('modal-book-pages').textContent = book.pages;
+            document.getElementById('modal-book-pages').textContent = `${book.pages} pág.`;
             document.getElementById('modal-book-time').textContent = book.readTime;
             document.getElementById('modal-book-download').href = book.pdf;
-            document.getElementById('modal-book-iframe').src = `${book.pdf}#toolbar=0&navpanes=0&scrollbar=0`;
+            document.getElementById('modal-book-iframe').src = book.pdf;
 
-            document.getElementById('book-modal').classList.add('active');
-            toggleBodyScroll(true);
-        }
-
-        // Abrir PDF Personalizado (Materiales y Bosquejos)
-        function openCustomPDF(title, author, pdfUrl) {
-            // Icono utilizado desde Supabase para fallback de imagen PDF
-            document.getElementById('modal-book-cover').src = 'https://jvjragofbpcfswhchnqc.supabase.co/storage/v1/object/public/IMAGENES/qwrqfff.png';
-            document.getElementById('modal-book-category').textContent = 'Bosquejo / Estudio PDF';
-            document.getElementById('modal-book-title').textContent = title;
-            document.getElementById('modal-book-author').textContent = author;
-            document.getElementById('modal-book-pages').textContent = 'PDF Expositivo';
-            document.getElementById('modal-book-time').textContent = 'Lectura guiada';
-            document.getElementById('modal-book-download').href = pdfUrl;
-            document.getElementById('modal-book-iframe').src = `${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`;
-
-            document.getElementById('book-modal').classList.add('active');
+            const modal = document.getElementById('book-modal');
+            modal.classList.add('active');
             toggleBodyScroll(true);
         }
 
         function closeBook() {
-            document.getElementById('book-modal').classList.remove('active');
-            setTimeout(() => {
-                document.getElementById('modal-book-iframe').src = '';
-            }, 400);
+            const modal = document.getElementById('book-modal');
+            modal.classList.remove('active');
+            document.getElementById('modal-book-iframe').src = '';
             toggleBodyScroll(false);
         }
 
+        function openCustomPDF(title, author, pdfUrl) {
+            document.getElementById('modal-book-cover').src = 'https://placehold.co/300x450/1A1C20/FFFFFF?text=Material+de+Estudio';
+            document.getElementById('modal-book-category').textContent = 'RECURSO BÍBLICO';
+            document.getElementById('modal-book-title').textContent = title;
+            document.getElementById('modal-book-author').textContent = author;
+            document.getElementById('modal-book-pages').textContent = 'Documento';
+            document.getElementById('modal-book-time').textContent = 'PDF';
+            document.getElementById('modal-book-download').href = pdfUrl;
+            document.getElementById('modal-book-iframe').src = pdfUrl;
+
+            const modal = document.getElementById('book-modal');
+            modal.classList.add('active');
+            toggleBodyScroll(true);
+        }
+
+        function toggleBodyScroll(disable) {
+            document.body.style.overflow = disable ? 'hidden' : '';
+        }
+
+        const audioEl = document.getElementById('global-audio');
+        let currentTrackIndex = 0;
+        let isPlaying = false;
+
+        const pTitle = document.getElementById('player-title');
+        const pCover = document.getElementById('player-cover');
+        const pCoverLink = document.getElementById('player-cover-link');
+        const btnPlay = document.getElementById('btn-play');
+        const iconPlayMain = document.getElementById('play-icon-main');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const pCurrentTime = document.getElementById('time-current');
+        const pTotalTime = document.getElementById('time-total');
+        const pProgressBar = document.getElementById('progress-bar');
+        const pProgressSlider = document.getElementById('progress-slider');
+        const pVolSlider = document.getElementById('volume-slider');
+        const playlistContainer = document.getElementById('playlist-container');
+
+        const miniPlayer = document.getElementById('mini-player');
+        const mTitle = document.getElementById('mini-title');
+        const mCover = document.getElementById('mini-cover');
+        const mBtnPlay = document.getElementById('mini-btn-play');
+        const mIconPlay = document.getElementById('mini-play-icon');
+        const mBtnPrev = document.getElementById('mini-btn-prev');
+        const mBtnNext = document.getElementById('mini-btn-next');
+
+        function renderPlaylist() {
+            playlistContainer.innerHTML = '';
+            musicTracks.forEach((track, index) => {
+                const thumbUrl = `https://img.youtube.com/vi/${track.ytId}/hqdefault.jpg`;
+                const isActive = index === currentTrackIndex;
+                
+                const itemHTML = `
+                    <div onclick="loadAndPlayTrack(${index})" class="group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-300 ${isActive ? 'bg-white/10 shadow-inner' : 'hover:bg-white/5'}">
+                        <div class="flex items-center gap-4">
+                            <div class="relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden">
+                                <img src="${thumbUrl}" alt="Cover" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <i data-lucide="${isActive && isPlaying ? 'pause' : 'play'}" class="w-5 h-5 text-white fill-current"></i>
+                                </div>
+                                ${isActive ? `
+                                <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                    <div class="flex items-end space-x-1 h-4">
+                                        <div class="w-1 bg-gold rounded-t ${isPlaying ? 'animate-[bounce_0.8s_infinite]' : 'h-1'}"></div>
+                                        <div class="w-1 bg-gold rounded-t ${isPlaying ? 'animate-[bounce_1.2s_infinite]' : 'h-2'}"></div>
+                                        <div class="w-1 bg-gold rounded-t ${isPlaying ? 'animate-[bounce_0.9s_infinite]' : 'h-1'}"></div>
+                                    </div>
+                                </div>` : ''}
+                            </div>
+                            <div>
+                                <h5 class="text-sm md:text-base font-medium ${isActive ? 'text-gold' : 'text-gray-200 group-hover:text-white'} transition-colors">${track.title}</h5>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-widest">Cristóbal Yévenes</p>
+                            </div>
+                        </div>
+                        <div class="text-gray-500 hidden sm:block px-4">
+                            <i data-lucide="music" class="w-4 h-4 ${isActive ? 'text-gold' : ''}"></i>
+                        </div>
+                    </div>
+                `;
+                playlistContainer.insertAdjacentHTML('beforeend', itemHTML);
+            });
+            lucide.createIcons({ root: playlistContainer });
+        }
+
+        function loadTrack(index) {
+            currentTrackIndex = index;
+            const track = musicTracks[index];
+            const coverUrl = `https://img.youtube.com/vi/${track.ytId}/maxresdefault.jpg`;
+            const ytUrl = `https://youtu.be/${track.ytId}`;
+            
+            audioEl.src = track.mp3;
+            audioEl.load();
+
+            pTitle.textContent = track.title;
+            pCover.src = coverUrl;
+            pCover.onerror = function() { this.src = `https://img.youtube.com/vi/${track.ytId}/hqdefault.jpg`; }; 
+            pCoverLink.href = ytUrl;
+
+            mTitle.textContent = track.title;
+            mCover.src = `https://img.youtube.com/vi/${track.ytId}/hqdefault.jpg`;
+
+            pProgressSlider.value = 0;
+            pProgressBar.style.width = '0%';
+            pCurrentTime.textContent = '0:00';
+
+            renderPlaylist();
+        }
+
+        function togglePlay() {
+            if (!audioEl.src) {
+                loadTrack(0);
+            }
+
+            if (isPlaying) {
+                audioEl.pause();
+                isPlaying = false;
+            } else {
+                audioEl.play().then(() => {
+                    isPlaying = true;
+                    miniPlayer.classList.remove('translate-y-full');
+                }).catch(err => {
+                    console.error("Error reproduciendo audio:", err);
+                });
+            }
+            updatePlayIcons();
+            renderPlaylist();
+        }
+
+        function loadAndPlayTrack(index) {
+            if (currentTrackIndex === index && isPlaying) {
+                togglePlay();
+                return;
+            }
+            loadTrack(index);
+            audioEl.play().then(() => {
+                isPlaying = true;
+                miniPlayer.classList.remove('translate-y-full');
+                updatePlayIcons();
+                renderPlaylist();
+            });
+        }
+
+        function updatePlayIcons() {
+            const playIconStr = isPlaying ? 'pause' : 'play';
+            btnPlay.innerHTML = `<i data-lucide="${playIconStr}" class="w-7 h-7 ${isPlaying ? '' : 'ml-1'} fill-current"></i>`;
+            mBtnPlay.innerHTML = `<i data-lucide="${playIconStr}" class="w-5 h-5 ${isPlaying ? '' : 'ml-0.5'} fill-current"></i>`;
+            lucide.createIcons({ root: btnPlay });
+            lucide.createIcons({ root: mBtnPlay });
+        }
+
+        btnPlay.addEventListener('click', togglePlay);
+        mBtnPlay.addEventListener('click', togglePlay);
+
+        btnNext.addEventListener('click', () => {
+            const nextIdx = (currentTrackIndex + 1) % musicTracks.length;
+            loadAndPlayTrack(nextIdx);
+        });
+        mBtnNext.addEventListener('click', () => {
+            const nextIdx = (currentTrackIndex + 1) % musicTracks.length;
+            loadAndPlayTrack(nextIdx);
+        });
+
+        btnPrev.addEventListener('click', () => {
+            const prevIdx = (currentTrackIndex - 1 + musicTracks.length) % musicTracks.length;
+            loadAndPlayTrack(prevIdx);
+        });
+        mBtnPrev.addEventListener('click', () => {
+            const prevIdx = (currentTrackIndex - 1 + musicTracks.length) % musicTracks.length;
+            loadAndPlayTrack(prevIdx);
+        });
+
+        audioEl.addEventListener('timeupdate', () => {
+            if (!isNaN(audioEl.duration) && audioEl.duration > 0) {
+                const pct = (audioEl.currentTime / audioEl.duration) * 100;
+                pProgressBar.style.width = `${pct}%`;
+                pProgressSlider.value = pct;
+                
+                pCurrentTime.textContent = formatTime(audioEl.currentTime);
+                pTotalTime.textContent = formatTime(audioEl.duration);
+            }
+        });
+
+        audioEl.addEventListener('ended', () => {
+            const nextIdx = (currentTrackIndex + 1) % musicTracks.length;
+            loadAndPlayTrack(nextIdx);
+        });
+
+        pProgressSlider.addEventListener('input', (e) => {
+            if (!isNaN(audioEl.duration) && audioEl.duration > 0) {
+                const targetTime = (e.target.value / 100) * audioEl.duration;
+                audioEl.currentTime = targetTime;
+            }
+        });
+
+        pVolSlider.addEventListener('input', (e) => {
+            audioEl.volume = e.target.value;
+        });
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        loadTrack(0);
+
         function toggleSearch(show) {
-            const modal = document.getElementById('search-modal');
-            if(show) {
-                modal.classList.add('active');
-                setTimeout(() => modal.querySelector('input').focus(), 100);
+            const searchModal = document.getElementById('search-modal');
+            if (show) {
+                searchModal.classList.add('active');
                 toggleBodyScroll(true);
             } else {
-                modal.classList.remove('active');
+                searchModal.classList.remove('active');
                 toggleBodyScroll(false);
             }
         }
 
-        // Scroll nav hide/show
-        let lastScrollTop = 0;
-        const nav = document.getElementById('main-nav');
-        window.addEventListener('scroll', () => {
-            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            if (scrollTop > lastScrollTop && scrollTop > 100) {
-                nav.classList.add('nav-hidden');
-            } else {
-                nav.classList.remove('nav-hidden');
-            }
-            lastScrollTop = scrollTop;
-        });
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
 
-        // Intersection Observer for scroll animations
-        const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
-        const observer = new IntersectionObserver((entries, observer) => {
+        const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
-                    observer.unobserve(entry.target);
                 }
             });
         }, observerOptions);
